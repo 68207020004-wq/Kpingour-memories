@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>สุขสันต์วันลอยกระทง & ครบรอบ 9 เดือน 💖</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Mali, Prompt & Itim -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Itim&family=Mali:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Tone.js for gentle romantic sound effects (collect sparkle & fireworks) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <style>
+        :root {
+            --pink-glow: rgba(255, 133, 179, 0.7);
+            --gold-glow: rgba(255, 223, 128, 0.85);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Prompt', sans-serif;
+            background: linear-gradient(180deg, #1b0b28 0%, #3b1447 38%, #7c2d68 68%, #b84b84 100%);
+        }
+
+        .font-mali {
+            font-family: 'Mali', cursive;
+        }
+
+        .font-itim {
+            font-family: 'Itim', cursive;
+        }
+
+        /* Fullscreen Canvas for Sky, Water, Krathongs, Petals & Fireworks */
+        #sceneCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: 1;
+            touch-action: manipulation;
+        }
+
+        /* Soft Glassmorphism Panels */
+        .glass-pink {
+            background: rgba(255, 238, 245, 0.16);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 192, 219, 0.4);
+            box-shadow: 0 8px 32px rgba(48, 10, 38, 0.35), inset 0 0 20px rgba(255, 182, 213, 0.15);
+        }
+
+        .card-paper {
+            background: linear-gradient(145deg, #fff8fb 0%, #ffeaf2 55%, #ffd9e8 100%);
+            border: 2px solid rgba(255, 166, 201, 0.8);
+            box-shadow: 0 20px 60px rgba(34, 6, 26, 0.65), 0 0 40px rgba(255, 128, 179, 0.45);
+        }
+
+        /* Floating & Pulse Animations */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 18px rgba(255, 117, 172, 0.6), 0 0 36px rgba(255, 175, 208, 0.4); transform: scale(1); }
+            50% { box-shadow: 0 0 28px rgba(255, 117, 172, 0.9), 0 0 54px rgba(255, 175, 208, 0.7); transform: scale(1.03); }
+        }
+
+        @keyframes cardReveal {
+            0% { opacity: 0; transform: scale(0.82) translateY(30px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.18); }
+            45% { transform: scale(0.95); }
+            65% { transform: scale(1.12); }
+        }
+
+        .animate-float {
+            animation: floatSlow 3.5s ease-in-out infinite;
+        }
+
+        .animate-pulse-glow {
+            animation: pulseGlow 2.4s ease-in-out infinite;
+        }
+
+        .animate-card-reveal {
+            animation: cardReveal 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .animate-heartbeat {
+            display: inline-block;
+            animation: heartBeat 1.5s infinite;
+        }
+
+        /* Custom Scrollbar inside Memory Card */
+        .custom-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(255, 182, 213, 0.2);
+            border-radius: 999px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(236, 72, 153, 0.45);
+            border-radius: 999px;
+        }
+
+        /* Floating popup text when collecting a krathong */
+        .collect-toast {
+            position: fixed;
+            pointer-events: none;
+            z-index: 30;
+            font-family: 'Mali', cursive;
+            font-weight: 700;
+            color: #fff0f7;
+            text-shadow: 0 2px 10px rgba(219, 39, 119, 0.9), 0 0 20px rgba(255, 182, 213, 0.8);
+            animation: riseFade 1.3s ease-out forwards;
+            white-space: nowrap;
+        }
+
+        @keyframes riseFade {
+            0% { opacity: 0; transform: translate(-50%, 10px) scale(0.7); }
+            20% { opacity: 1; transform: translate(-50%, -10px) scale(1.08); }
+            100% { opacity: 0; transform: translate(-50%, -65px) scale(0.95); }
+        }
+
+        /* Hidden YouTube Audio Container (1x1 off-screen so IFrame API plays smoothly) */
+        #yt-player-wrapper {
+            position: fixed;
+            bottom: 12px;
+            left: 12px;
+            width: 1px;
+            height: 1px;
+            opacity: 0.01;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Interactive Canvas (Moonlight, Stars, Cherry Petals, Waves, Krathongs, Fireworks) -->
+    <canvas id="sceneCanvas"></canvas>
+
+    <!-- Hidden YouTube Player for "แค่คุณ - Musketeers" starting at 0:44 (44s) -->
+    <div id="yt-player-wrapper">
+        <div id="youtube-player"></div>
+    </div>
+
+    <!-- Fallback HTML5 Audio if user loads local MP3 -->
+    <audio id="localAudio" loop></audio>
+
+    <!-- Top HUD Bar (Progress + Music Controls) -->
+    <header id="hudBar" class="fixed top-0 left-0 right-0 z-20 p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-2 pointer-events-none opacity-0 transition-opacity duration-700">
+        <!-- Counter & Progress Pill -->
+        <div class="glass-pink rounded-full px-4 py-2 flex items-center gap-3 pointer-events-auto w-full max-w-sm">
+            <span class="text-xl animate-heartbeat">🪷</span>
+            <div class="flex-1">
+                <div class="flex justify-between items-center text-xs sm:text-sm font-mali font-semibold text-pink-100 mb-1">
+                    <span>เก็บกระทงความทรงจำ</span>
+                    <span id="counterText" class="text-pink-200 font-bold">0 / 20 ดวง</span>
+                </div>
+                <div class="w-full h-2.5 bg-pink-950/50 rounded-full overflow-hidden border border-pink-300/30">
+                    <div id="progressBar" class="h-full bg-gradient-to-r from-pink-400 via-rose-400 to-amber-200 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Music Status & Controls -->
+        <div class="flex items-center gap-2 pointer-events-auto">
+            <button id="musicToggleBtn" onclick="toggleMusic()" class="glass-pink hover:bg-pink-400/30 active:scale-95 transition text-pink-100 rounded-full px-3.5 py-2 text-xs sm:text-sm font-mali flex items-center gap-2 shadow-lg">
+                <span id="musicIcon">🎵</span>
+                <span id="musicLabel" class="max-w-[165px] truncate">แค่คุณ - Musketeers (0:44)</span>
+            </button>
+            <label title="เลือกไฟล์เพลง MP3 สำรองจากเครื่อง" class="glass-pink hover:bg-pink-400/30 active:scale-95 transition text-pink-100 rounded-full p-2 text-xs cursor-pointer" aria-label="อัปโหลดไฟล์เสียงสำรอง">
+                <span>📂</span>
+                <input type="file" id="audioUploadInput" accept="audio/*" class="hidden" onchange="handleCustomAudio(event)">
+            </label>
+        </div>
+    </header>
+
+    <!-- Bottom Interactive Controls during Gameplay -->
+    <div id="gameControls" class="fixed bottom-5 left-0 right-0 z-20 px-4 flex flex-col items-center gap-2.5 pointer-events-none opacity-0 transition-opacity duration-700">
+        <!-- Reveal Card Button (Appears when 20/20 collected) -->
+        <button id="openCardBtn" onclick="openMemoryCard()" class="hidden pointer-events-auto animate-pulse-glow bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 hover:from-pink-400 hover:to-rose-500 text-white font-mali font-bold text-base sm:text-lg px-7 py-3.5 rounded-full border-2 border-pink-200 shadow-2xl flex items-center gap-2 transition transform active:scale-95">
+            <span>เปิดการ์ดความทรงจำ 9 เดือน</span>
+            <span class="text-xl">💌</span>
+        </button>
+
+        <!-- Hint & Spawn Krathong Button -->
+        <div id="playHintRow" class="flex items-center gap-2 pointer-events-auto">
+            <button onclick="spawnUserKrathong()" class="glass-pink hover:bg-pink-400/30 active:scale-95 transition text-pink-100 font-mali text-xs sm:text-sm px-4 py-2 rounded-full flex items-center gap-1.5">
+                <span>✨ ปล่อยกระทงเพิ่ม</span>
+            </button>
+            <div class="glass-pink text-pink-100/90 font-mali text-xs sm:text-sm px-4 py-2 rounded-full">
+                แตะที่กระทงลอยน้ำเพื่อเก็บ 💕
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. Welcome Screen Overlay -->
+    <section id="welcomeScreen" class="fixed inset-0 z-30 flex items-center justify-center p-4 bg-gradient-to-b from-[#1a0826]/70 via-[#3b1246]/55 to-[#5e1d56]/65 backdrop-blur-[3px] transition-opacity duration-700">
+        <div class="glass-pink max-w-md w-full rounded-3xl p-6 sm:p-8 text-center text-pink-50 animate-float relative overflow-hidden">
+            <!-- Decorative Sparkles -->
+            <div class="text-4xl sm:text-5xl mb-3 drop-shadow">🌕🪷💖</div>
+            <p class="text-xs sm:text-sm uppercase tracking-widest text-pink-200/90 font-medium mb-1">
+                Our 9 Months Memory & Loy Krathong
+            </p>
+            <h1 class="font-mali text-2xl sm:text-3xl font-bold text-white leading-snug mb-3 drop-shadow">
+                คืนวันลอยกระทงแสนพิเศษ<br>
+                <span class="text-pink-300">ของเรานะอ้วน 💕</span>
+            </h1>
+            <p class="font-itim text-sm sm:text-base text-pink-100/90 mb-6 leading-relaxed">
+                มีความทรงจำและข้อความพิเศษซ่อนอยู่ในการ์ดใบนี้...<br>
+                ลองช่วยกันเก็บกระทงให้ครบ <span class="text-amber-200 font-bold">20 ดวง</span> เพื่อเปิดอ่านดูนะ
+            </p>
+
+            <!-- Start Button -->
+            <button onclick="startExperience()" class="animate-pulse-glow w-full sm:w-auto bg-gradient-to-r from-pink-500 via-rose-500 to-pink-500 hover:from-pink-400 hover:to-rose-400 text-white font-mali font-bold text-base sm:text-lg px-8 py-3.5 rounded-full border border-pink-200/80 shadow-xl transition transform active:scale-95 cursor-pointer">
+                เริ่มต้นลอยกระทง & เปิดเพลง 🎶
+            </button>
+
+            <p class="mt-4 text-[11px] text-pink-200/75 font-light">
+                ♪ เพลงประกอบ: แค่คุณ - Musketeers (ท่อน 0:44)
+            </p>
+        </div>
+    </section>
+
+    <!-- 3. Memory Card Modal (Revealed after 20 Krathongs) -->
+    <div id="memoryCardModal" class="fixed inset-0 z-40 hidden items-center justify-center p-3 sm:p-6 bg-[#1b061d]/75 backdrop-blur-md overflow-y-auto">
+        <div class="card-paper max-w-lg w-full rounded-3xl p-5 sm:p-7 text-rose-950 relative animate-card-reveal my-auto max-h-[92vh] flex flex-col">
+            
+            <!-- Close Button -->
+            <button onclick="closeMemoryCard()" aria-label="ปิดการ์ด" class="absolute top-3.5 right-3.5 w-9 h-9 rounded-full bg-pink-200/80 hover:bg-pink-300 text-rose-700 flex items-center justify-center font-bold transition active:scale-90 z-10">
+                ✕
+            </button>
+
+            <!-- Card Header -->
+            <div class="text-center mb-3 shrink-0">
+                <div class="inline-flex items-center gap-1.5 bg-pink-200/70 text-rose-700 text-xs font-mali font-bold px-3.5 py-1 rounded-full mb-1.5 border border-pink-300">
+                    <span>🪷</span>
+                    <span>Happy Loy Krathong & 9th Month Anniversary</span>
+                    <span>💖</span>
+                </div>
+                <h2 class="font-mali text-xl sm:text-2xl font-bold text-rose-600">
+                    ครบรอบ 9 เดือนแล้วนะอ้วน 💕
+                </h2>
+            </div>
+
+            <!-- Scrollable Content Area (Photo + Heartfelt Message) -->
+            <div class="overflow-y-auto custom-scroll pr-1 space-y-4">
+                
+                <!-- Polaroid Couple Photo Frame -->
+                <div class="bg-white p-2.5 sm:p-3 rounded-2xl shadow-md border border-pink-200 mx-auto max-w-[270px] sm:max-w-[300px] transform -rotate-1 hover:rotate-0 transition duration-300">
+                    <div class="relative aspect-[4/5] w-full rounded-xl overflow-hidden bg-pink-100 flex items-center justify-center">
+                        <!-- Uses IMG_1921.jpeg directly when placed alongside index.html on GitHub Pages -->
+                        <img 
+                            id="couplePhoto" 
+                            src="IMG_1921.jpeg" 
+                            alt="รูปคู่ความทรงจำ 9 เดือน" 
+                            class="w-full h-full object-cover"
+                            onerror="handlePhotoFallback(this)"
+                        >
+                        <!-- Fallback UI shown only if IMG_1921.jpeg is not found in current preview environment -->
+                        <div id="photoFallbackBox" class="hidden flex-col items-center justify-center text-center p-4 w-full h-full bg-gradient-to-br from-pink-100 via-rose-100 to-pink-200 text-rose-700">
+                            <span class="text-4xl mb-2">💑📸</span>
+                            <p class="font-mali font-bold text-xs sm:text-sm mb-1">รูปคู่ของเรา (IMG_1921.jpeg)</p>
+                            <p class="text-[11px] text-rose-600/80 mb-3 leading-snug">
+                                เมื่อนำไฟล์รูป <code class="bg-white/70 px-1 rounded">IMG_1921.jpeg</code> วางคู่กันบน GitHub Pages รูปจะขึ้นอัตโนมัติ หรือกดเลือกรูปเพื่อดูตัวอย่างตอนนี้ได้เลย
+                            </p>
+                            <label class="cursor-pointer bg-rose-500 hover:bg-rose-600 text-white text-xs font-mali font-semibold px-3.5 py-1.5 rounded-full shadow transition">
+                                เลือกรูปจากเครื่องเพื่อพรีวิว
+                                <input type="file" accept="image/*" class="hidden" onchange="previewLocalPhoto(event)">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="pt-2.5 pb-0.5 text-center flex items-center justify-between px-1">
+                        <span class="font-itim text-xs sm:text-sm text-rose-500">9 Months Together 🌸</span>
+                        <label class="text-[11px] text-pink-500 hover:text-rose-600 underline cursor-pointer font-mali" title="เปลี่ยนรูปพรีวิว">
+                            เปลี่ยนรูป
+                            <input type="file" accept="image/*" class="hidden" onchange="previewLocalPhoto(event)">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Heartfelt Message Box -->
+                <div class="bg-white/80 rounded-2xl p-4 sm:p-5 border border-pink-200/90 shadow-inner relative">
+                    <div class="text-pink-400 text-lg mb-1">❝</div>
+                    <p class="font-mali text-sm sm:text-base text-rose-900 leading-relaxed font-medium indent-4">
+                        สุขสันต์วันลอยกระทงและวันครบรอบนะ เค้ารักอ้วนมากที่สุดเลยรู้มั้ยเราเข้า9เดือนแล้วนะขอบคุณนะที่อยู่กับเค้ามาตลอด9เดือนขอบคุณที่ตั้งใจรักเค้าขนาดนี้ขอให้เรารักกันแบบนี้ไปนานๆและไปตลอดขอให้รักของเรามั่นคงและนานไม่เหี่ยวเฉาเหมือนดอกไม้นะ
+                    </p>
+                    <div class="text-right text-pink-400 text-lg mt-1">❞</div>
+                    <div class="mt-2 pt-2 border-t border-pink-100 flex items-center justify-between text-xs font-itim text-rose-500">
+                        <span>รักอ้วนที่สุดในโลก 💖</span>
+                        <span>ตลอดไปนะ 🌸</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Footer Actions -->
+            <div class="mt-4 pt-3 border-t border-pink-200/80 flex flex-wrap items-center justify-center gap-2.5 shrink-0">
+                <button onclick="resetAndPlayAgain()" class="bg-pink-100 hover:bg-pink-200 text-rose-700 font-mali font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-full border border-pink-300 transition active:scale-95">
+                    🪷 ลอยกระทงอีกครั้ง
+                </button>
+                <button onclick="closeMemoryCard()" class="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white font-mali font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-md transition active:scale-95">
+                    ชมพลุ & บรรยากาศต่อ ✨
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ============================================================================
+         * 1. YOUTUBE MUSIC INTEGRATION ("แค่คุณ - Musketeers" starting at 0:44)
+         * ============================================================================
+         */
+        let ytPlayer = null;
+        let isYtReady = false;
+        let isPlayingMusic = false;
+        let usingLocalAudio = false;
+        const YT_VIDEO_ID = '16-wFAbvQiU'; // Musketeers - แค่คุณ Official MV
+        const START_SECONDS = 44; // ท่อน 0:44
+
+        // Load YouTube IFrame Player API asynchronously
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('youtube-player', {
+                height: '100',
+                width: '100',
+                videoId: YT_VIDEO_ID,
+                playerVars: {
+                    autoplay: 0,
+                    controls: 0,
+                    start: START_SECONDS,
+                    loop: 1,
+                    playlist: YT_VIDEO_ID,
+                    playsinline: 1,
+                    rel: 0
+                },
+                events: {
+                    onReady: () => {
+                        isYtReady = true;
+                    },
+                    onStateChange: (event) => {
+                        // Loop back smoothly to 0:44 when song ends
+                        if (event.data === YT.PlayerState.ENDED) {
+                            ytPlayer.seekTo(START_SECONDS, true);
+                            ytPlayer.playVideo();
+                        }
+                    }
+                }
+            });
+        }
+
+        function startMusicFrom044() {
+            if (usingLocalAudio) {
+                const audio = document.getElementById('localAudio');
+                audio.play().then(() => {
+                    isPlayingMusic = true;
+                    updateMusicUI();
+                }).catch(() => {});
+                return;
+            }
+
+            if (isYtReady && ytPlayer && typeof ytPlayer.seekTo === 'function') {
+                ytPlayer.seekTo(START_SECONDS, true);
+                ytPlayer.setVolume(85);
+                ytPlayer.playVideo();
+                isPlayingMusic = true;
+                updateMusicUI();
+            } else {
+                // Retry shortly if API is still initializing
+                setTimeout(() => {
+                    if (isYtReady && ytPlayer) {
+                        ytPlayer.seekTo(START_SECONDS, true);
+                        ytPlayer.playVideo();
+                        isPlayingMusic = true;
+                        updateMusicUI();
+                    }
+                }, 800);
+            }
+        }
+
+        function toggleMusic() {
+            if (usingLocalAudio) {
+                const audio = document.getElementById('localAudio');
+                if (audio.paused) {
+                    audio.play();
+                    isPlayingMusic = true;
+                } else {
+                    audio.pause();
+                    isPlayingMusic = false;
+                }
+                updateMusicUI();
+                return;
+            }
+
+            if (!isYtReady || !ytPlayer) return;
+            if (isPlayingMusic) {
+                ytPlayer.pauseVideo();
+                isPlayingMusic = false;
+            } else {
+                ytPlayer.playVideo();
+                isPlayingMusic = true;
+            }
+            updateMusicUI();
+        }
+
+        function updateMusicUI() {
+            const icon = document.getElementById('musicIcon');
+            const label = document.getElementById('musicLabel');
+            if (isPlayingMusic) {
+                icon.textContent = '🎶';
+                if (!usingLocalAudio) label.textContent = 'แค่คุณ - Musketeers (0:44)';
+            } else {
+                icon.textContent = '🔇';
+                label.textContent = 'ปิดเสียงอยู่ (แตะเปิด)';
+            }
+        }
+
+        function handleCustomAudio(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (isYtReady && ytPlayer) ytPlayer.pauseVideo();
+
+            const audio = document.getElementById('localAudio');
+            audio.src = URL.createObjectURL(file);
+            audio.currentTime = 0;
+            audio.play().then(() => {
+                usingLocalAudio = true;
+                isPlayingMusic = true;
+                document.getElementById('musicIcon').textContent = '🎶';
+                document.getElementById('musicLabel').textContent = file.name;
+            }).catch(() => {});
+        }
+
+        /**
+         * ============================================================================
+         * 2. GENTLE SOUND EFFECTS (Tone.js synthesized chimes & sparkles)
+         * ============================================================================
+         */
+        let chimeSynth = null;
+        function initToneEffects() {
+            try {
+                if (typeof Tone !== 'undefined' && !chimeSynth) {
+                    chimeSynth = new Tone.PolySynth(Tone.Synth, {
+                        oscillator: { type: 'sine' },
+                        envelope: { attack: 0.01, decay: 0.25, sustain: 0.05, release: 0.6 }
+                    }).toDestination();
+                    chimeSynth.volume.value = -12;
+                }
+            } catch (e) {}
+        }
+
+        function playCollectSound(count) {
+            try {
+                if (!chimeSynth) return;
+                if (Tone.context.state !== 'running') Tone.start();
+                const notes = ['C5', 'E5', 'G5', 'B5', 'C6', 'E6'];
+                const note = notes[count % notes.length];
+                chimeSynth.triggerAttackRelease(note, '16n');
+            } catch (e) {}
+        }
+
+        function playCelebrationChord() {
+            try {
+                if (!chimeSynth) return;
+                if (Tone.context.state !== 'running') Tone.start();
+                chimeSynth.triggerAttackRelease(['C5', 'E5', 'G5', 'B5', 'D6'], '4n');
+            } catch (e) {}
+        }
+
+        /**
+         * ============================================================================
+         * 3. INTERACTIVE LOY KRATHONG & ROMANTIC SKY CANVAS ENGINE
+         * ============================================================================
+         */
+        const canvas = document.getElementById('sceneCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        let gameStarted = false;
+        let collectedCount = 0;
+        const TARGET_COUNT = 20;
+        let celebrationActive = false;
+        let cardHasAutoOpened = false;
+
+        const sweetPhrases = [
+            "9 เดือนแล้วนะ 💖",
+            "รักอ้วนที่สุดเลย 🥰",
+            "อยู่ด้วยกันไปนานๆ 🌸",
+            "สุขสันต์วันลอยกระทง 🪷",
+            "ขอบคุณที่รักกันนะ 💕",
+            "รักมั่นคงตลอดไป ✨",
+            "อ้วนของเค้า 💗",
+            "น่ารักที่สุดเลย 🌷"
+        ];
+
+        // Scene entities
+        let stars = [];
+        let petals = [];
+        let krathongs = [];
+        let particles = [];
+        let fireworks = [];
+        let time = 0;
+        let lastSpawnTime = 0;
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            initStars();
+        }
+
+        function initStars() {
+            stars = [];
+            const starCount = Math.floor((width * height) / 9000);
+            for (let i = 0; i < starCount; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * (height * 0.56),
+                    r: Math.random() * 1.8 + 0.4,
+                    phase: Math.random() * Math.PI * 2,
+                    speed: Math.random() * 0.03 + 0.01
+                });
+            }
+        }
+
+        function initPetals() {
+            petals = [];
+            const count = width < 600 ? 22 : 38;
+            for (let i = 0; i < count; i++) {
+                petals.push(createPetal(true));
+            }
+        }
+
+        function createPetal(randomY = false) {
+            return {
+                x: Math.random() * width,
+                y: randomY ? Math.random() * height : -20,
+                size: Math.random() * 6 + 4,
+                speedY: Math.random() * 0.8 + 0.45,
+                speedX: Math.random() * 0.8 - 0.4,
+                angle: Math.random() * Math.PI * 2,
+                spin: (Math.random() - 0.5) * 0.04,
+                color: Math.random() > 0.4 ? 'rgba(255, 183, 213, 0.75)' : 'rgba(255, 224, 238, 0.8)'
+            };
+        }
+
+        function createKrathong(customX = null, customY = null) {
+            const waterTop = height * 0.57;
+            const waterBottom = height * 0.90;
+            const laneY = customY !== null
+                ? Math.max(waterTop + 25, Math.min(waterBottom, customY))
+                : waterTop + 28 + Math.random() * (waterBottom - waterTop - 35);
+
+            // Perspective scale based on depth in water
+            const depthRatio = (laneY - waterTop) / (waterBottom - waterTop);
+            const scale = 0.68 + depthRatio * 0.48;
+            const fromLeft = Math.random() > 0.25;
+            const startX = customX !== null ? customX : (fromLeft ? -60 : width + 60);
+            const dir = customX !== null ? (Math.random() > 0.5 ? 1 : -1) : (fromLeft ? 1 : -1);
+
+            return {
+                id: Math.random().toString(36).slice(2),
+                x: startX,
+                y: laneY,
+                baseY: laneY,
+                scale: scale,
+                vx: dir * (0.45 + Math.random() * 0.65) * (0.7 + depthRatio * 0.5),
+                bobPhase: Math.random() * Math.PI * 2,
+                collected: false,
+                collectAnim: 0,
+                hueShift: Math.random() * 18 - 9
+            };
+        }
+
+        function initInitialKrathongs() {
+            krathongs = [];
+            const initialNum = width < 600 ? 6 : 8;
+            for (let i = 0; i < initialNum; i++) {
+                const k = createKrathong(Math.random() * width);
+                krathongs.push(k);
+            }
+        }
+
+        function spawnUserKrathong() {
+            const k = createKrathong(width * (0.2 + Math.random() * 0.6), height * (0.64 + Math.random() * 0.2));
+            krathongs.push(k);
+            burstHearts(k.x, k.y - 15, 8);
+        }
+
+        // Draw Pink Lotus Krathong with glowing candle & incense
+        function drawKrathong(k) {
+            ctx.save();
+            ctx.translate(k.x, k.y);
+            ctx.scale(k.scale, k.scale);
+
+            if (k.collected) {
+                ctx.globalAlpha = Math.max(0, 1 - k.collectAnim);
+                ctx.translate(0, -k.collectAnim * 45);
+                const popScale = 1 + k.collectAnim * 0.35;
+                ctx.scale(popScale, popScale);
+            }
+
+            // Warm candlelight aura on water
+            const glowGrad = ctx.createRadialGradient(0, -18, 4, 0, -10, 62);
+            glowGrad.addColorStop(0, 'rgba(255, 224, 145, 0.52)');
+            glowGrad.addColorStop(0.5, 'rgba(255, 130, 185, 0.24)');
+            glowGrad.addColorStop(1, 'rgba(255, 130, 185, 0)');
+            ctx.fillStyle = glowGrad;
+            ctx.beginPath();
+            ctx.arc(0, -10, 62, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Water ripple ring under krathong
+            ctx.strokeStyle = 'rgba(255, 214, 234, 0.38)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.ellipse(0, 12, 38 + Math.sin(time * 3 + k.bobPhase) * 4, 9, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Base (Banana leaf / pastel pink woven base)
+            ctx.fillStyle = '#863a6f';
+            ctx.beginPath();
+            ctx.ellipse(0, 8, 30, 10, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Outer Pink Lotus Petals
+            const outerPetals = 7;
+            for (let i = 0; i < outerPetals; i++) {
+                const angle = ((i / (outerPetals - 1)) - 0.5) * 2.1;
+                ctx.save();
+                ctx.translate(Math.sin(angle) * 18, 4);
+                ctx.rotate(angle * 0.65);
+                const petalGrad = ctx.createLinearGradient(0, -16, 0, 6);
+                petalGrad.addColorStop(0, '#ff9ec7');
+                petalGrad.addColorStop(1, '#d9468f');
+                ctx.fillStyle = petalGrad;
+                ctx.beginPath();
+                ctx.moveTo(0, -16);
+                ctx.quadraticCurveTo(10, -4, 0, 6);
+                ctx.quadraticCurveTo(-10, -4, 0, -16);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // Inner Soft Pastel Petals
+            const innerPetals = 5;
+            for (let i = 0; i < innerPetals; i++) {
+                const angle = ((i / (innerPetals - 1)) - 0.5) * 1.5;
+                ctx.save();
+                ctx.translate(Math.sin(angle) * 11, 2);
+                ctx.rotate(angle * 0.5);
+                const innerGrad = ctx.createLinearGradient(0, -18, 0, 4);
+                innerGrad.addColorStop(0, '#fff0f7');
+                innerGrad.addColorStop(1, '#ff77b7');
+                ctx.fillStyle = innerGrad;
+                ctx.beginPath();
+                ctx.moveTo(0, -18);
+                ctx.quadraticCurveTo(8, -6, 0, 4);
+                ctx.quadraticCurveTo(-8, -6, 0, -18);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // Incense Sticks (ธูป)
+            ctx.strokeStyle = '#ffd1dc';
+            ctx.lineWidth = 1.4;
+            ctx.beginPath();
+            ctx.moveTo(-3, -4);
+            ctx.lineTo(-7, -28);
+            ctx.moveTo(3, -4);
+            ctx.lineTo(7, -28);
+            ctx.stroke();
+
+            // Candle Body (เทียนสีชมพูทอง)
+            ctx.fillStyle = '#ffe599';
+            ctx.fillRect(-2.5, -22, 5, 16);
+
+            // Flickering Candle Flame
+            const flicker = Math.sin(time * 16 + k.bobPhase) * 1.5;
+            const flameGrad = ctx.createRadialGradient(0, -27, 1, 0, -27, 9);
+            flameGrad.addColorStop(0, '#ffffff');
+            flameGrad.addColorStop(0.45, '#ffe066');
+            flameGrad.addColorStop(1, 'rgba(255, 110, 150, 0)');
+            ctx.fillStyle = flameGrad;
+            ctx.beginPath();
+            ctx.moveTo(0, -35 + flicker);
+            ctx.quadraticCurveTo(5.5, -27, 0, -22);
+            ctx.quadraticCurveTo(-5.5, -27, 0, -35 + flicker);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // Draw Heart Shape helper
+        function drawHeart(x, y, size, color, alpha = 1) {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.translate(x, y);
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            const topCurveHeight = size * 0.3;
+            ctx.moveTo(0, topCurveHeight);
+            ctx.bezierCurveTo(0, 0, -size / 2, 0, -size / 2, topCurveHeight);
+            ctx.bezierCurveTo(-size / 2, (size + topCurveHeight) / 2, 0, (size + topCurveHeight) / 1.3, 0, size);
+            ctx.bezierCurveTo(0, (size + topCurveHeight) / 1.3, size / 2, (size + topCurveHeight) / 2, size / 2, topCurveHeight);
+            ctx.bezierCurveTo(size / 2, 0, 0, 0, 0, topCurveHeight);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function burstHearts(x, y, count = 14) {
+            const palette = ['#ff69b4', '#ff99cc', '#ffd1e8', '#ffe082', '#ff4d94'];
+            for (let i = 0; i < count; i++) {
+                const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
+                const speed = Math.random() * 2.8 + 1.2;
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 1.4,
+                    size: Math.random() * 10 + 7,
+                    alpha: 1,
+                    decay: Math.random() * 0.02 + 0.015,
+                    color: palette[Math.floor(Math.random() * palette.length)],
+                    isHeart: Math.random() > 0.25
+                });
+            }
+        }
+
+        function launchFirework() {
+            const fx = width * (0.15 + Math.random() * 0.7);
+            const fy = height * (0.12 + Math.random() * 0.32);
+            const colors = ['#ff7eb9', '#ff65a3', '#feff9c', '#ffc2e2', '#ffffff'];
+            const mainColor = colors[Math.floor(Math.random() * colors.length)];
+            const count = 34;
+
+            for (let i = 0; i < count; i++) {
+                // Heart-shaped firework equation
+                const t = (Math.PI * 2 * i) / count;
+                const hx = 16 * Math.pow(Math.sin(t), 3);
+                const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                const scale = 0.16 + Math.random() * 0.04;
+
+                fireworks.push({
+                    x: fx,
+                    y: fy,
+                    vx: hx * scale,
+                    vy: hy * scale,
+                    alpha: 1,
+                    decay: 0.014 + Math.random() * 0.008,
+                    color: mainColor,
+                    size: 3.2
+                });
+            }
+        }
+
+        function showCollectToast(x, y, text) {
+            const el = document.createElement('div');
+            el.className = 'collect-toast text-sm sm:text-base';
+            el.style.left = `${Math.max(70, Math.min(width - 70, x))}px`;
+            el.style.top = `${Math.max(80, y - 25)}px`;
+            el.textContent = text;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1300);
+        }
+
+        // Main Render Loop
+        function animate(timestamp) {
+            time += 0.016;
+            ctx.clearRect(0, 0, width, height);
+
+            const horizonY = height * 0.56;
+
+            // 1. Romantic Pink-Twilight Sky Gradient
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, horizonY);
+            skyGrad.addColorStop(0, '#180724');
+            skyGrad.addColorStop(0.45, '#43144e');
+            skyGrad.addColorStop(0.85, '#8c2f6b');
+            skyGrad.addColorStop(1, '#c9568c');
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, width, horizonY);
+
+            // 2. Twinkling Stars
+            stars.forEach(s => {
+                const twinkle = 0.35 + 0.65 * Math.abs(Math.sin(time * 2 + s.phase));
+                ctx.fillStyle = `rgba(255, 235, 245, ${twinkle})`;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // 3. Full Romantic Moon & Soft Pink Halo
+            const moonX = width * 0.78;
+            const moonY = height * 0.21;
+            const moonR = Math.min(width, height) * 0.068;
+
+            const moonHalo = ctx.createRadialGradient(moonX, moonY, moonR * 0.5, moonX, moonY, moonR * 4.2);
+            moonHalo.addColorStop(0, 'rgba(255, 244, 214, 0.55)');
+            moonHalo.addColorStop(0.4, 'rgba(255, 166, 209, 0.22)');
+            moonHalo.addColorStop(1, 'rgba(255, 166, 209, 0)');
+            ctx.fillStyle = moonHalo;
+            ctx.beginPath();
+            ctx.arc(moonX, moonY, moonR * 4.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#fff9e6';
+            ctx.beginPath();
+            ctx.arc(moonX, moonY, moonR, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 4. Distant Silhouette Hills
+            ctx.fillStyle = '#2d0d36';
+            ctx.beginPath();
+            ctx.moveTo(0, horizonY);
+            ctx.quadraticCurveTo(width * 0.25, horizonY - 28, width * 0.52, horizonY);
+            ctx.quadraticCurveTo(width * 0.78, horizonY - 22, width, horizonY);
+            ctx.lineTo(width, horizonY + 10);
+            ctx.lineTo(0, horizonY + 10);
+            ctx.fill();
+
+            // 5. Pink Shimmering River Water
+            const waterGrad = ctx.createLinearGradient(0, horizonY, 0, height);
+            waterGrad.addColorStop(0, '#6e2158');
+            waterGrad.addColorStop(0.35, '#47123b');
+            waterGrad.addColorStop(1, '#22071e');
+            ctx.fillStyle = waterGrad;
+            ctx.fillRect(0, horizonY, width, height - horizonY);
+
+            // Moonlight Reflection Shimmer on Water
+            for (let i = 0; i < 16; i++) {
+                const ry = horizonY + 12 + i * ((height - horizonY) / 17);
+                const shimmerW = (24 + i * 5) + Math.sin(time * 2.5 + i) * 14;
+                const shimmerX = moonX + Math.sin(time * 1.6 + i * 0.8) * 12;
+                ctx.fillStyle = `rgba(255, 210, 232, ${0.22 - i * 0.01})`;
+                ctx.beginPath();
+                ctx.ellipse(shimmerX, ry, shimmerW, 2.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Gentle Water Wave Lines
+            ctx.strokeStyle = 'rgba(255, 175, 212, 0.14)';
+            ctx.lineWidth = 1.2;
+            for (let w = 0; w < 8; w++) {
+                const wy = horizonY + 25 + w * ((height - horizonY) / 8);
+                ctx.beginPath();
+                for (let x = 0; x <= width; x += 30) {
+                    const yOffset = Math.sin(x * 0.015 + time * 1.8 + w) * 3;
+                    if (x === 0) ctx.moveTo(x, wy + yOffset);
+                    else ctx.lineTo(x, wy + yOffset);
+                }
+                ctx.stroke();
+            }
+
+            // 6. Auto-spawn Krathongs gently
+            if (timestamp - lastSpawnTime > 1700 && krathongs.length < 11) {
+                krathongs.push(createKrathong());
+                lastSpawnTime = timestamp;
+            }
+
+            // Sort Krathongs by Y so closer ones overlap farther ones naturally
+            krathongs.sort((a, b) => a.y - b.y);
+
+            // Update & Draw Krathongs
+            for (let i = krathongs.length - 1; i >= 0; i--) {
+                const k = krathongs[i];
+                k.x += k.vx;
+                k.y = k.baseY + Math.sin(time * 2.2 + k.bobPhase) * 3.5;
+
+                if (k.collected) {
+                    k.collectAnim += 0.045;
+                    if (k.collectAnim >= 1) {
+                        krathongs.splice(i, 1);
+                        continue;
+                    }
+                } else if ((k.vx > 0 && k.x > width + 80) || (k.vx < 0 && k.x < -80)) {
+                    krathongs.splice(i, 1);
+                    continue;
+                }
+
+                drawKrathong(k);
+            }
+
+            // 7. Falling Sakura / Rose Petals
+            petals.forEach(p => {
+                p.y += p.speedY;
+                p.x += p.speedX + Math.sin(time + p.angle) * 0.35;
+                p.angle += p.spin;
+
+                if (p.y > height + 15) {
+                    Object.assign(p, createPetal(false));
+                }
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.angle);
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, p.size, p.size * 0.55, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+
+            // 8. Collect Heart & Sparkle Particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const pt = particles[i];
+                pt.x += pt.vx;
+                pt.y += pt.vy;
+                pt.vy += 0.03;
+                pt.alpha -= pt.decay;
+
+                if (pt.alpha <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                if (pt.isHeart) {
+                    drawHeart(pt.x, pt.y, pt.size, pt.color, pt.alpha);
+                } else {
+                    ctx.save();
+                    ctx.globalAlpha = pt.alpha;
+                    ctx.fillStyle = pt.color;
+                    ctx.beginPath();
+                    ctx.arc(pt.x, pt.y, pt.size * 0.3, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            // 9. Celebration Fireworks (after 20 Krathongs)
+            if (celebrationActive && Math.random() < 0.045) {
+                launchFirework();
+            }
+
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                const fw = fireworks[i];
+                fw.x += fw.vx;
+                fw.y += fw.vy;
+                fw.vy += 0.025;
+                fw.alpha -= fw.decay;
+
+                if (fw.alpha <= 0) {
+                    fireworks.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.globalAlpha = fw.alpha;
+                ctx.fillStyle = fw.color;
+                ctx.shadowColor = fw.color;
+                ctx.shadowBlur = 8;
+                ctx.beginPath();
+                ctx.arc(fw.x, fw.y, fw.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        /**
+         * ============================================================================
+         * 4. USER INTERACTION: COLLECTING 20 KRATHONGS & CARD REVEAL
+         * ============================================================================
+         */
+        function handleCanvasTap(clientX, clientY) {
+            if (!gameStarted) return;
+
+            let hitAny = false;
+            // Check from foreground (bottom) to background
+            for (let i = krathongs.length - 1; i >= 0; i--) {
+                const k = krathongs[i];
+                if (k.collected) continue;
+
+                const hitRadius = 48 * k.scale;
+                const dx = clientX - k.x;
+                const dy = clientY - (k.y - 6);
+
+                if (dx * dx + dy * dy <= hitRadius * hitRadius) {
+                    collectKrathong(k);
+                    hitAny = true;
+                    break;
+                }
+            }
+
+            // If user taps empty water, spawn a gentle ripple + mini heart
+            if (!hitAny && clientY > height * 0.56) {
+                burstHearts(clientX, clientY, 5);
+            }
+        }
+
+        canvas.addEventListener('pointerdown', (e) => {
+            handleCanvasTap(e.clientX, e.clientY);
+        });
+
+        function collectKrathong(k) {
+            k.collected = true;
+            burstHearts(k.x, k.y - 12, 16);
+
+            if (collectedCount < TARGET_COUNT) {
+                collectedCount++;
+                playCollectSound(collectedCount);
+                updateProgressUI();
+
+                const phrase = collectedCount === TARGET_COUNT
+                    ? "ครบ 20 ดวงแล้ว! เปิดการ์ดเลย 💌"
+                    : sweetPhrases[(collectedCount - 1) % sweetPhrases.length];
+                showCollectToast(k.x, k.y, phrase);
+
+                if (collectedCount === TARGET_COUNT) {
+                    trigger20KrathongsCelebration();
+                }
+            } else {
+                playCollectSound(5);
+                showCollectToast(k.x, k.y, "รักอ้วนที่สุด 💖");
+            }
+        }
+
+        function updateProgressUI() {
+            const counterText = document.getElementById('counterText');
+            const progressBar = document.getElementById('progressBar');
+            counterText.textContent = `${collectedCount} / ${TARGET_COUNT} ดวง`;
+            const pct = Math.min(100, (collectedCount / TARGET_COUNT) * 100);
+            progressBar.style.width = `${pct}%`;
+        }
+
+        function trigger20KrathongsCelebration() {
+            celebrationActive = true;
+            playCelebrationChord();
+
+            // Launch immediate wave of heart fireworks
+            launchFirework();
+            setTimeout(launchFirework, 350);
+            setTimeout(launchFirework, 700);
+
+            // Show "Open Memory Card" button
+            const openBtn = document.getElementById('openCardBtn');
+            openBtn.classList.remove('hidden');
+
+            // Automatically open the memory card smoothly after 1.6s of fireworks
+            if (!cardHasAutoOpened) {
+                cardHasAutoOpened = true;
+                setTimeout(() => {
+                    openMemoryCard();
+                }, 1650);
+            }
+        }
+
+        /**
+         * ============================================================================
+         * 5. FLOW CONTROLS (WELCOME -> GAME -> MEMORY CARD)
+         * ============================================================================
+         */
+        function startExperience() {
+            initToneEffects();
+            startMusicFrom044();
+
+            const welcome = document.getElementById('welcomeScreen');
+            welcome.style.opacity = '0';
+            setTimeout(() => {
+                welcome.style.display = 'none';
+            }, 650);
+
+            document.getElementById('hudBar').classList.remove('opacity-0');
+            document.getElementById('gameControls').classList.remove('opacity-0');
+
+            gameStarted = true;
+            // Ensure plenty of krathongs are ready to tap immediately
+            if (krathongs.length < 7) {
+                for (let i = 0; i < 4; i++) {
+                    krathongs.push(createKrathong(width * (0.15 + i * 0.22)));
+                }
+            }
+        }
+
+        function openMemoryCard() {
+            const modal = document.getElementById('memoryCardModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            burstHearts(width / 2, height / 2, 24);
+        }
+
+        function closeMemoryCard() {
+            const modal = document.getElementById('memoryCardModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function resetAndPlayAgain() {
+            closeMemoryCard();
+            collectedCount = 0;
+            celebrationActive = false;
+            cardHasAutoOpened = false;
+            updateProgressUI();
+            document.getElementById('openCardBtn').classList.add('hidden');
+            initInitialKrathongs();
+        }
+
+        // Photo fallback & live preview helpers
+        function handlePhotoFallback(imgEl) {
+            imgEl.style.display = 'none';
+            const fallback = document.getElementById('photoFallbackBox');
+            fallback.classList.remove('hidden');
+            fallback.classList.add('flex');
+        }
+
+        function previewLocalPhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const imgEl = document.getElementById('couplePhoto');
+            const fallback = document.getElementById('photoFallbackBox');
+            imgEl.src = URL.createObjectURL(file);
+            imgEl.style.display = 'block';
+            fallback.classList.add('hidden');
+            fallback.classList.remove('flex');
+        }
+
+        // Initialize on Window Load
+        window.addEventListener('resize', resizeCanvas);
+        window.onload = function () {
+            resizeCanvas();
+            initPetals();
+            initInitialKrathongs();
+            requestAnimationFrame(animate);
+        };
+    </script>
+</body>
+</html>
